@@ -1,0 +1,60 @@
+{
+  "singleton" : false,
+  "category" : "device_enhancements",
+  "author" : "Chris Jenkins",
+  "icon" : "icon.png",
+  "moduleName":"Zway-ZoneMinder",
+  "version" : "0.0.1",
+  "maturity" : "alpha",
+  "repository" : {
+    "type" : "git",
+    "source" : "https://github.com/c-jenkins/Zway-ZoneMinder"
+  },
+  "defaults" : {
+    "title" : "ZoneMinder",
+    "description" : "ZoneMinder Monitor control",
+    "zm_host": "192.168.0.100",
+    "zm_port": "80",
+    "zm_username": "admin",
+    "zm_password": ""
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "zm_host": {
+        "required": true
+      },
+      "zm_port": {
+        "required": true
+      },
+      "zm_username": {
+        "required": true
+      },
+      "zm_password": {
+        "required": true
+      }
+    },
+    "required": true
+  },
+  "options": {
+    "fields": {
+      "zm_host": {
+        "label": "ZoneMinder server IP address",
+        "required": true
+      },
+      "zm_port": {
+        "label": "ZoneMinder server port",
+        "required": true
+      },
+      "zm_username": {
+        "label": "ZoneMinder user",
+        "required": true
+      },
+      "zm_password": {
+        "label": "ZoneMinder password",
+        "required": true,
+        "type": "password"
+      }
+    }
+  }
+}
