@@ -1,9 +1,9 @@
 {
-  "singleton" : false,
-  "category" : "device_enhancements",
+  "singleton" : true,
+  "category" : "security",
   "author" : "Chris Jenkins",
   "icon" : "icon.png",
-  "moduleName":"Zway-ZoneMinder",
+  "moduleName":"ZoneMinder",
   "version" : "0.0.1",
   "maturity" : "alpha",
   "repository" : {
@@ -14,7 +14,7 @@
     "title" : "ZoneMinder",
     "description" : "ZoneMinder Monitor control",
     "zm_host": "192.168.0.100",
-    "zm_port": "80",
+    "zm_port": "443",
     "zm_username": "admin",
     "zm_password": ""
   },
