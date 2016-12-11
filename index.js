@@ -16,7 +16,7 @@ _module = ZoneMinder;
 ZoneMinder.prototype.init = function (config) {
 
     ZoneMinder.super_.prototype.init.call(this, config);
-    console.log('ZoneMinder: starting...');
+    console.log('[ZoneMinder] starting...');
 
     var self = this;
     self.config = config;
@@ -48,7 +48,9 @@ ZoneMinder.prototype.init = function (config) {
 
     this.authenticate = function (config, baseUrl) {
         var args = config.zm_username + " " + config.zm_password + " " + baseUrl;
-        return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh " + args);
+        var resp = system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh " + args);
+        self.log("Auth response: " + resp);
+        return resp;
     }
 
     self.authCookie = self.authenticate(config, self.baseUrl);
