@@ -34,8 +34,14 @@ ZoneMinder.prototype.init = function (config) {
             url: baseUrl + "/zm/api/monitors.json",
             method: "GET",
             async: true,
+            headers: {
+              "Cookie": self.authCookie
+            },
             success: function (response) {
                 self.log("Monitors: " + response.data);
+            },
+            error: function (response) {
+                self.log("Error when getting monitors (" + response.status + ")");
             }
         });
     }
