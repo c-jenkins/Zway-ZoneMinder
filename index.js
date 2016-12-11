@@ -20,50 +20,32 @@ ZoneMinder.prototype.init = function (config) {
 
     var self = this;
     self.config = config;
-    self.authenticated = false;
-    self.authenticationFailed = false;
+    self.authCookie = null;
+
     var service = config.zm_port == '443' ? "https" : "http";
     self.baseUrl = service + "://" + config.zm_host + ":" + config.zm_port;
-    var moduleName = "ZoneMinder";
-    
-    this.getMonitors = function (config) {
+
+    this.log = function (message) {
+        console.log('[ZoneMinder] ' + message);
+    };
+
+    this.getMonitors = function (baseUrl) {
         http.request({
-            url: self.baseUrl + "/zm/api/monitors.json",
+            url: baseUrl + "/zm/api/monitors.json",
             method: "GET",
             async: true,
             success: function (response) {
-                console.log("ZM Monitors: " + response.data);
+                self.log("Monitors: " + response.data);
             }
         });
     }
 
-    this.authenticate = function (config) {
-    
-	this.log = function (message) {
-            console.log('ZoneMinder: ' + message);
-    	};
-
-        http.request({
-            url: self.baseUrl + "/zm/index.php",
-            method: "POST",
-            data: {
-                username: config.zm_username,
-                password: config.zm_password,
-                action: "login",
-                view: "console"
-            },
-            async: true,
-            success: function (response) {
-                console.log("ZM Auth successful");
-                self.getMonitors(config);
-            },
-            error: function (response) {
-                self.authenticationFailed = true;
-                self.controller.addNotification("error", response.statusText, "module", moduleName);
-            }
-        });
+    this.authenticate = function (config, baseUrl) {
+        var args = config.zm_username + " " + config.zm_password + " " + baseUrl;
+        return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh " + args);
     }
 
-    this.authenticate(config);
+    self.authCookie = self.authenticate(config, self.baseUrl);
+    self.getMonitors(self.baseUrl);
 };
 

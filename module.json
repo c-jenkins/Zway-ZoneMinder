@@ -15,6 +15,7 @@
     "description" : "ZoneMinder Monitor control",
     "zm_host": "192.168.0.100",
     "zm_port": "443",
+    "zm_use_ssl": true,
     "zm_username": "admin",
     "zm_password": ""
   },
@@ -25,6 +26,9 @@
         "required": true
       },
       "zm_port": {
+        "required": true
+      },
+      "zm_use_ssl": {
         "required": true
       },
       "zm_username": {
@@ -45,6 +49,11 @@
       "zm_port": {
         "label": "ZoneMinder server port",
         "required": true
+      },
+      "zm_use_ssl": {
+        "label": "Use SSL?",
+        "required": true,
+        "type": "checkbox"
       },
       "zm_username": {
         "label": "ZoneMinder user",
