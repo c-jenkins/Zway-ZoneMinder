@@ -29,6 +29,12 @@ ZoneMinder.prototype.init = function (config) {
         console.log('[ZoneMinder] ' + message);
     };
 
+    this.authenticate = function (config, baseUrl) {
+        var args = config.zm_username + " " + config.zm_password + " " + baseUrl;
+        return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
+            config.zm_username, config.zm_password, baseUrl);
+    }
+
     this.getMonitors = function (baseUrl) {
         http.request({
             url: baseUrl + "/zm/api/monitors.json",
@@ -38,7 +44,8 @@ ZoneMinder.prototype.init = function (config) {
               "Cookie": self.authCookie
             },
             success: function (response) {
-                self.log("Monitors: " + response.data);
+                self.log("Monitors data collected);
+                return JSON.parse(response.data);
             },
             error: function (response) {
                 self.log("Error when getting monitors (" + response.status + ")");
@@ -46,13 +53,10 @@ ZoneMinder.prototype.init = function (config) {
         });
     }
 
-    this.authenticate = function (config, baseUrl) {
-        var args = config.zm_username + " " + config.zm_password + " " + baseUrl;
-        return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
-                      config.zm_username, config.zm_password, baseUrl);
-    }
-
     self.authCookie = self.authenticate(config, self.baseUrl)[1];
-    self.getMonitors(self.baseUrl);
+    var monitorConfig = self.getMonitors(self.baseUrl);
+
+    self.log(monitorConfig);
+
 };
 
