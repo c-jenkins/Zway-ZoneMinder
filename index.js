@@ -45,7 +45,7 @@ ZoneMinder.prototype.init = function (config) {
             },
             success: function (response) {
                 self.log("Monitors data collected");
-                return JSON.parse(response.data);
+                self.configureMonitors(response.data);
             },
             error: function (response) {
                 self.log("Error when getting monitors (" + response.status + ")");
@@ -53,10 +53,14 @@ ZoneMinder.prototype.init = function (config) {
         });
     }
 
-    self.authCookie = self.authenticate(config, self.baseUrl)[1];
-    var monitorConfig = self.getMonitors(self.baseUrl);
+    self.configureMonitors = function (monitorConfig) {
+        monitorConfig.monitors.forEach(function (monitor) {
+            self.log("Monitor " + Monitor.Id + ", State: " + Monitor.Function);
+        });
+    }
 
-    self.log(monitorConfig);
+    self.authCookie = self.authenticate(config, self.baseUrl)[1];
+    self.getMonitors(self.baseUrl);
 
 };
 
