@@ -52,7 +52,7 @@ ZoneMinder.prototype.init = function (config) {
                       config.zm_username, config.zm_password, baseUrl);
     }
 
-    self.authCookie = self.authenticate(config, self.baseUrl);
+    self.authCookie = self.authenticate(config, self.baseUrl)[1];
     self.getMonitors(self.baseUrl);
 };
 
