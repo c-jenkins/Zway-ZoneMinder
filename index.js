@@ -48,9 +48,8 @@ ZoneMinder.prototype.init = function (config) {
 
     this.authenticate = function (config, baseUrl) {
         var args = config.zm_username + " " + config.zm_password + " " + baseUrl;
-        var resp = system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh " + args);
-        self.log("Auth response: " + resp);
-        return resp;
+        return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
+                      config.zm_username, config.zm_password, baseUrl);
     }
 
     self.authCookie = self.authenticate(config, self.baseUrl);
