@@ -44,7 +44,7 @@ ZoneMinder.prototype.init = function (config) {
               "Cookie": self.authCookie
             },
             success: function (response) {
-                self.log("Monitors data collected);
+                self.log("Monitors data collected");
                 return JSON.parse(response.data);
             },
             error: function (response) {
