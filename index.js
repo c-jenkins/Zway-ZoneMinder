@@ -21,6 +21,7 @@ ZoneMinder.prototype.init = function (config) {
     var self = this;
     self.config = config;
     self.authCookie = null;
+    self.monitors = [];
 
     var service = config.zm_port == '443' ? "https" : "http";
     self.baseUrl = service + "://" + config.zm_host + ":" + config.zm_port;
@@ -62,7 +63,50 @@ ZoneMinder.prototype.getMonitors = function (baseUrl) {
 ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
     var self = this;
     monitorConfig.monitors.forEach(function (m) {
-        self.log("Monitor " + m.Monitor.Id + ", State: " + m.Monitor.Function);
+        var monitorId = m.Monitor.Id;
+        var currentFunction = m.Monitor.Function;
+
+        self.log("Monitor " + monitorId + ", Current Function: " + currentFunction);
+
+        vDev = self.controller.devices.create({
+            deviceId: "ZoneMinder_Monitor_" + monitorId + "_" + self.id,
+            defaults: {
+                deviceType: "switchBinary",
+                metrics: {
+                    title: "ZoneMinder Monitor " + monitorId,
+                    icon: ""
+                }
+            },
+            overlay: {},
+            handler: function (command, args) {
+                self.setMonitorFunction(monitorId, command === "on" ? "Modect" : "Monitor");
+            }
+        });
+        self.monitors.push(monitorId);
+    });
+}
+
+ZoneMinder.prototype.stop = function () {
+    var self = this;
+    this.monitors.forEach( function (monitorId) {
+        self.controller.devices.remove("ZoneMinder_Monitor_" + monitorId + "_" + self.id);
+    });
+}
+
+ZoneMinder.prototype.setMonitorFunction(monitorId, monitorFunction) {
+    var self = this;
+
+    http.request({
+        url: self.baseUrl + "/zm/api/monitors/" + monitorId + ".json",
+        method: "POST",
+        data: "Monitor[Function]=" + monitorFunction + "&Monitor[Enabled]:true",
+        async: true,
+        headers: {
+            "Cookie": self.authCookie
+        },
+        error: function (response) {
+            self.log("Error when attempting to set monitor function (" + response.status + ")");
+        }
     });
 }
 
