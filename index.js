@@ -93,7 +93,7 @@ ZoneMinder.prototype.stop = function () {
     });
 }
 
-ZoneMinder.prototype.setMonitorFunction(monitorId, monitorFunction) {
+ZoneMinder.prototype.setMonitorFunction = function (monitorId, monitorFunction) {
     var self = this;
 
     http.request({
