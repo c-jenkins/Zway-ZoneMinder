@@ -38,13 +38,13 @@ ZoneMinder.prototype.log = function (message) {
 ZoneMinder.prototype.authenticate = function (config, baseUrl) {
     return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
         config.zm_username, config.zm_password, baseUrl);
-}
+};
 
-ZoneMinder.prototype.getMonitors = function (baseUrl) {
+ZoneMinder.prototype.getMonitors = function () {
     var self = this;
 
     http.request({
-        url: baseUrl + "/zm/api/monitors.json",
+        url: self.baseUrl + "/zm/api/monitors.json",
         method: "GET",
         async: true,
         headers: {
@@ -58,7 +58,7 @@ ZoneMinder.prototype.getMonitors = function (baseUrl) {
             self.log("Error when getting monitors (" + response.status + ")");
         }
     });
-}
+};
 
 ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
     var self = this;
@@ -74,26 +74,33 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
                 deviceType: "switchBinary",
                 metrics: {
                     title: "ZoneMinder Monitor " + monitorId,
-                    icon: ""
+                    icon: "switch"
                 }
             },
             overlay: {},
             handler: function (command, args) {
-                self.setMonitorFunction(monitorId, command === "on" ? "Modect" : "Monitor");
+                if (command === "off" || command === "on") {
+                    self.setMonitorFunction(this, monitorId, command === "on" ? "Modect" : "Monitor");
+                }
             }
         });
+        self.updateStateMetric(vDev, currentFunction === "Modect" ? "on" : "off");
         self.monitors.push(monitorId);
     });
-}
+};
+
+ZoneMinder.prototype.updateStateMetric = function (vDev, state) {
+    vDev.set("metrics:level", state);
+};
 
 ZoneMinder.prototype.stop = function () {
     var self = this;
     this.monitors.forEach( function (monitorId) {
         self.controller.devices.remove("ZoneMinder_Monitor_" + monitorId + "_" + self.id);
     });
-}
+};
 
-ZoneMinder.prototype.setMonitorFunction = function (monitorId, monitorFunction) {
+ZoneMinder.prototype.setMonitorFunction = function (vDev, monitorId, monitorFunction) {
     var self = this;
 
     http.request({
@@ -104,10 +111,13 @@ ZoneMinder.prototype.setMonitorFunction = function (monitorId, monitorFunction) 
         headers: {
             "Cookie": self.authCookie
         },
+        success: function (response) {
+            self.updateStateMetric(vDev, monitorFunction === "Modect" ? "on" : "off");
+        },
         error: function (response) {
             self.log("Error when attempting to set monitor function (" + response.status + ")");
         }
     });
-}
+};
 
 
