@@ -26,7 +26,7 @@ ZoneMinder.prototype.init = function (config) {
     var service = config.zm_port == '443' ? "https" : "http";
     self.baseUrl = service + "://" + config.zm_host + ":" + config.zm_port;
 
-    self.authCookie = self.authenticate(config, self.baseUrl)[1];
+    self.authCookie = self.authenticate(config, self.baseUrl)[1].trim();
     self.getMonitors(self.baseUrl);
 
 };
