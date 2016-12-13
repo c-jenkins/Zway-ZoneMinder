@@ -77,7 +77,12 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
                     icon: "switch"
                 }
             },
-            overlay: {},
+            overlay: {
+                deviceType: "switchBinary",
+                metrics: {
+                    scaleTitle: ""
+                }
+            },
             handler: function (command, args) {
                 if (command === "off" || command === "on") {
                     self.setMonitorFunction(this, monitorId, command === "on" ? "Modect" : "Monitor");
