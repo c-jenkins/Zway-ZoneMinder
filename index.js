@@ -40,6 +40,8 @@ ZoneMinder.prototype.authenticate = function (config, baseUrl) {
 }
 
 ZoneMinder.prototype.getMonitors = function (baseUrl) {
+    var self = this;
+
     http.request({
         url: baseUrl + "/zm/api/monitors.json",
         method: "GET",
@@ -58,6 +60,7 @@ ZoneMinder.prototype.getMonitors = function (baseUrl) {
 }
 
 ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
+    var self = this;
     monitorConfig.monitors.forEach(function (m) {
         self.log("Monitor " + m.Monitor.Id + ", State: " + m.Monitor.Function);
     });
