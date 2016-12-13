@@ -30,16 +30,16 @@ ZoneMinder.prototype.init = function (config) {
 
 };
 
-ZoneMinder.prototype..log = function (message) {
+ZoneMinder.prototype.log = function (message) {
     console.log('[ZoneMinder] ' + message);
 };
 
-ZoneMinder.prototype..authenticate = function (config, baseUrl) {
+ZoneMinder.prototype.authenticate = function (config, baseUrl) {
     return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
         config.zm_username, config.zm_password, baseUrl);
 }
 
-ZoneMinder.prototype..getMonitors = function (baseUrl) {
+ZoneMinder.prototype.getMonitors = function (baseUrl) {
     http.request({
         url: baseUrl + "/zm/api/monitors.json",
         method: "GET",
@@ -57,7 +57,7 @@ ZoneMinder.prototype..getMonitors = function (baseUrl) {
     });
 }
 
-ZoneMinder.prototype..configureMonitors = function (monitorConfig) {
+ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
     monitorConfig.monitors.forEach(function (m) {
         self.log("Monitor " + m.Monitor.Id + ", State: " + m.Monitor.Function);
     });
