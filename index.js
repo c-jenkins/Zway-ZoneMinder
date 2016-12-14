@@ -28,7 +28,6 @@ ZoneMinder.prototype.init = function (config) {
     var service = config.zm_port == '443' ? "https" : "http";
     self.baseUrl = service + "://" + config.zm_host + ":" + config.zm_port;
 
-    self.authCookie = self.authenticate(config, self.baseUrl)[1].trim();
     self.getMonitors(self.configureMonitors);
 
 };
@@ -36,6 +35,10 @@ ZoneMinder.prototype.init = function (config) {
 ZoneMinder.prototype.log = function (message) {
     console.log('[ZoneMinder] ' + message);
 };
+
+ZoneMinder.prototype.getAuthCookie = function () {
+    return self.authenticate()[1].trim();
+}
 
 ZoneMinder.prototype.authenticate = function () {
     return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
@@ -66,7 +69,7 @@ ZoneMinder.prototype.getMonitors = function (responseCallback) {
             self.log("Error when getting monitors (" + response.status + ")");
             if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
                 self.log("Retrying getMonitors(), attempt " + self.retries);
-                self.authCookie = self.authenticate();
+                self.authCookie = self.getAuthCookie();
                 self.getMonitors(responseCallback);
             }
         }
@@ -134,7 +137,7 @@ ZoneMinder.prototype.setMonitorFunction = function (vDev, monitorId, monitorFunc
             self.log("Error when attempting to set monitor function (" + response.status + ")");
             if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
                 self.log("Retrying setMonitorFunction(), attempt " + self.retries);
-                self.authCookie = self.authenticate();
+                self.authCookie = self.getAuthCookie();
                 self.setMonitorFunction(vDev, monitorId, monitorFunction);
             }
         }
