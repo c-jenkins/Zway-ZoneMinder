@@ -66,7 +66,7 @@ ZoneMinder.prototype.getMonitors = function (responseCallback) {
             self.log("Error when getting monitors (" + response.status + ")");
             if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
                 self.log("Retrying getMonitors(), attempt " + self.retries);
-                self.authenticate();
+                self.authCookie = self.authenticate();
                 self.getMonitors(responseCallback);
             }
         }
@@ -134,7 +134,7 @@ ZoneMinder.prototype.setMonitorFunction = function (vDev, monitorId, monitorFunc
             self.log("Error when attempting to set monitor function (" + response.status + ")");
             if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
                 self.log("Retrying setMonitorFunction(), attempt " + self.retries);
-                self.authenticate();
+                self.authCookie = self.authenticate();
                 self.setMonitorFunction(vDev, monitorId, monitorFunction);
             }
         }
