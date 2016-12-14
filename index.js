@@ -37,6 +37,7 @@ ZoneMinder.prototype.log = function (message) {
 };
 
 ZoneMinder.prototype.getAuthCookie = function () {
+    var self = this;
     return self.authenticate()[1].trim();
 }
 
