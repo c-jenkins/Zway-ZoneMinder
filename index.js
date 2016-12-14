@@ -39,7 +39,7 @@ ZoneMinder.prototype.log = function (message) {
 
 ZoneMinder.prototype.authenticate = function () {
     return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
-        self.config.zm_username, self.config.zm_password, self.baseUrl);
+        this.config.zm_username, this.config.zm_password, this.baseUrl);
 };
 
 ZoneMinder.prototype.getMonitors = function (responseCallback) {
