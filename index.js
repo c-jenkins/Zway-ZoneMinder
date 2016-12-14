@@ -58,8 +58,8 @@ ZoneMinder.prototype.getMonitors = function (responseCallback) {
             self.log("Monitors data collected");
             self.retries = 0;
 
-            if (responseCallback !== null) {
-                responseCallback(response.data);
+            if (responseCallback != null) {
+                responseCallback.call(self, response.data);
             }
         },
         error: function (response) {
