@@ -22,12 +22,14 @@ ZoneMinder.prototype.init = function (config) {
     self.config = config;
     self.authCookie = null;
     self.monitors = [];
+    self.retries = 0;
+    self.maxRetryAttempts = 3;
 
     var service = config.zm_port == '443' ? "https" : "http";
     self.baseUrl = service + "://" + config.zm_host + ":" + config.zm_port;
 
     self.authCookie = self.authenticate(config, self.baseUrl)[1].trim();
-    self.getMonitors(self.baseUrl);
+    self.getMonitors(self.configureMonitors);
 
 };
 
@@ -35,13 +37,15 @@ ZoneMinder.prototype.log = function (message) {
     console.log('[ZoneMinder] ' + message);
 };
 
-ZoneMinder.prototype.authenticate = function (config, baseUrl) {
+ZoneMinder.prototype.authenticate = function () {
     return system("/opt/z-way-server/automation/userModules/ZoneMinder/authenticateZoneMinder.sh",
-        config.zm_username, config.zm_password, baseUrl);
+        self.config.zm_username, self.config.zm_password, self.baseUrl);
 };
 
-ZoneMinder.prototype.getMonitors = function () {
+ZoneMinder.prototype.getMonitors = function (responseCallback) {
     var self = this;
+
+    self.retries++;
 
     http.request({
         url: self.baseUrl + "/zm/api/monitors.json",
@@ -52,10 +56,19 @@ ZoneMinder.prototype.getMonitors = function () {
         },
         success: function (response) {
             self.log("Monitors data collected");
-            self.configureMonitors(response.data);
+            self.retries = 0;
+
+            if (responseCallback !== null) {
+                responseCallback(response.data);
+            }
         },
         error: function (response) {
             self.log("Error when getting monitors (" + response.status + ")");
+            if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
+                self.log("Retrying getMonitors(), attempt " + self.retries);
+                self.authenticate();
+                self.getMonitors(responseCallback);
+            }
         }
     });
 };
@@ -77,12 +90,7 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
                     icon: "switch"
                 }
             },
-            overlay: {
-                deviceType: "switchBinary",
-                metrics: {
-                    scaleTitle: ""
-                }
-            },
+            overlay: {},
             handler: function (command, args) {
                 if (command === "off" || command === "on") {
                     self.setMonitorFunction(this, monitorId, command === "on" ? "Modect" : "Monitor");
@@ -108,6 +116,8 @@ ZoneMinder.prototype.stop = function () {
 ZoneMinder.prototype.setMonitorFunction = function (vDev, monitorId, monitorFunction) {
     var self = this;
 
+    self.retries++;
+
     http.request({
         url: self.baseUrl + "/zm/api/monitors/" + monitorId + ".json",
         method: "POST",
@@ -118,9 +128,15 @@ ZoneMinder.prototype.setMonitorFunction = function (vDev, monitorId, monitorFunc
         },
         success: function (response) {
             self.updateStateMetric(vDev, monitorFunction === "Modect" ? "on" : "off");
+            self.retries = 0;
         },
         error: function (response) {
             self.log("Error when attempting to set monitor function (" + response.status + ")");
+            if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
+                self.log("Retrying setMonitorFunction(), attempt " + self.retries);
+                self.authenticate();
+                self.setMonitorFunction(vDev, monitorId, monitorFunction);
+            }
         }
     });
 };
