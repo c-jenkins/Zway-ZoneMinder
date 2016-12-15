@@ -96,6 +96,9 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
             },
             overlay: {},
             handler: function (command, args) {
+                if (command === "update") {
+                    self.updateMonitorState(this, monitorId);
+                }
                 if (command === "off" || command === "on") {
                     self.setMonitorFunction(this, monitorId, command === "on" ? "Modect" : "Monitor");
                 }
@@ -105,6 +108,30 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
         self.monitors.push(monitorId);
     });
 };
+
+ZoneMinder.prototype.updateMonitorState = function (vDev, monitorId) {
+    var self = this;
+
+    http.request({
+        url: self.baseUrl + "/zm/api/monitors/" + monitorId + ".json",
+        async: true,
+        headers: {
+            "Cookie": self.authCookie
+        },
+        success: function (response) {
+            self.updateStateMetric(vDev, response.data.monitor.Monitor.Function === "Modect" ? "on" : "off");
+        },
+        error: function (response) {
+            self.log("Error when attempting to set monitor function (" + response.status + ")");
+            if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
+                self.log("Retrying setMonitorFunction(), attempt " + self.retries);
+                self.authCookie = self.getAuthCookie();
+                self.updateMonitorState(vDev, monitorId);
+            }
+        }
+    })
+}
+
 
 ZoneMinder.prototype.updateStateMetric = function (vDev, state) {
     vDev.set("metrics:level", state);
