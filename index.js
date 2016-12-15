@@ -108,7 +108,7 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
         self.updateStateMetric(vDev, currentFunction === "Modect" ? "on" : "off");
 
         if (vDev) {
-            this.timer.push(
+            this.timers.push(
                 setInterval(function() {
                     self.updateMonitorState(vDev);
                 }, 5 * 1000)
