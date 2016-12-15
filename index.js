@@ -124,6 +124,7 @@ ZoneMinder.prototype.updateMonitorState = function (vDev, monitorId) {
 
     http.request({
         url: self.baseUrl + "/zm/api/monitors/" + monitorId + ".json",
+        method: "GET",
         async: true,
         headers: {
             "Cookie": self.authCookie
@@ -132,9 +133,9 @@ ZoneMinder.prototype.updateMonitorState = function (vDev, monitorId) {
             self.updateStateMetric(vDev, response.data.monitor.Monitor.Function === "Modect" ? "on" : "off");
         },
         error: function (response) {
-            self.log("Error when attempting to set monitor function (" + response.status + ")");
+            self.log("Error when attempting to get monitor state (" + response.status + ")");
             if (response.status === 401 && self.retries <= self.maxRetryAttempts) {
-                self.log("Retrying setMonitorFunction(), attempt " + self.retries);
+                self.log("Retrying updateMonitorState(), attempt " + self.retries);
                 self.authCookie = self.getAuthCookie();
                 self.updateMonitorState(vDev, monitorId);
             }
