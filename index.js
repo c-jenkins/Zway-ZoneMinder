@@ -122,7 +122,7 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
 ZoneMinder.prototype.updateMonitorState = function (vDev, monitorId) {
     var self = this;
 
-    self.log("Updating status for monitor " + monitorId + ", vDev " + vDev);
+    self.log("Updating status for monitor " + monitorId + ", vDev " + vDev.id);
 
     http.request({
         url: self.baseUrl + "/zm/api/monitors/" + monitorId + ".json",
