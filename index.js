@@ -110,7 +110,7 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
         if (vDev) {
             self.timers.push(
                 setInterval(function() {
-                    self.updateMonitorState(vDev);
+                    self.updateMonitorState(vDev, monitorId);
                 }, 5 * 1000)
             );
         }
