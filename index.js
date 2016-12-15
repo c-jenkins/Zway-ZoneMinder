@@ -22,6 +22,7 @@ ZoneMinder.prototype.init = function (config) {
     self.config = config;
     self.authCookie = null;
     self.monitors = [];
+    this.timers = [];
     self.retries = 0;
     self.maxRetryAttempts = 3;
 
@@ -105,6 +106,15 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
             }
         });
         self.updateStateMetric(vDev, currentFunction === "Modect" ? "on" : "off");
+
+        if (vDev) {
+            this.timer.push(
+                setInterval(function() {
+                    self.updateMonitorState(vDev);
+                }, 5 * 1000)
+            );
+        }
+
         self.monitors.push(monitorId);
     });
 };
@@ -141,6 +151,10 @@ ZoneMinder.prototype.stop = function () {
     var self = this;
     this.monitors.forEach( function (monitorId) {
         self.controller.devices.remove("ZoneMinder_Monitor_" + monitorId + "_" + self.id);
+    });
+
+    this.timers.forEach( function (t) {
+        clearInterval(t);
     });
 };
 
