@@ -22,9 +22,10 @@ ZoneMinder.prototype.init = function (config) {
     self.config = config;
     self.authCookie = null;
     self.monitors = [];
-    this.timers = [];
+    self.timers = [];
     self.retries = 0;
     self.maxRetryAttempts = 3;
+    self.updatePollingInterval = 5;
 
     var service = config.zm_port == '443' ? "https" : "http";
     self.baseUrl = service + "://" + config.zm_host + ":" + config.zm_port;
@@ -112,7 +113,7 @@ ZoneMinder.prototype.configureMonitors = function (monitorConfig) {
             self.timers.push(
                 setInterval(function() {
                     self.updateMonitorState(theDev, monitorId);
-                }, 5 * 1000)
+                }, self.updatePollingInterval * 1000)
             );
         }
 
